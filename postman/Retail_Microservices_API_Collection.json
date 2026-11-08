@@ -1,0 +1,345 @@
+{
+  "info": {
+    "name": "Retail Microservices System - E2E API Suite",
+    "description": "Comprehensive End-to-End API collection testing all 10 Retail domain use cases through Spring Cloud API Gateway (Port 8080).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Authentication & Security (NFR 5.3)",
+      "item": [
+        {
+          "name": "Customer Registration (UC-1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex.morgan@retaildomain.com\",\n  \"password\": \"SecureRetail2026!\",\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Morgan\",\n  \"phone\": \"+1-555-019-2834\",\n  \"shippingAddress\": \"742 Evergreen Terrace, Springfield, OR 97477\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/customers/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "customers", "register"]
+            }
+          }
+        },
+        {
+          "name": "Customer Login (15m JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.environment.set('accessToken', jsonData.data.accessToken);",
+                  "    pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                  "    pm.environment.set('customerId', jsonData.data.customer.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex.morgan@retaildomain.com\",\n  \"password\": \"SecureRetail2026!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/customers/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "customers", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Use Case 1: Customer Profile",
+      "item": [
+        {
+          "name": "Get Customer Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/customers/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "customers", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Use Case 2: Product Search & Browsing",
+      "item": [
+        {
+          "name": "Search Products with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products?keyword=laptop&minRating=4.0&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"],
+              "query": [
+                { "key": "keyword", "value": "laptop" },
+                { "key": "minRating", "value": "4.0" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Use Case 3: Shopping Cart Management",
+      "item": [
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productSku\": \"SKU-PROD-001\",\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart", "items"]
+            }
+          }
+        },
+        {
+          "name": "View Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Use Case 4 & 5: Order Checkout Saga & Tracking",
+      "item": [
+        {
+          "name": "Place Order (Saga Trigger)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.orderNumber) {",
+                  "    pm.environment.set('orderNumber', jsonData.data.orderNumber);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingAddress\": \"742 Evergreen Terrace, Springfield, OR 97477\",\n  \"billingAddress\": \"742 Evergreen Terrace, Springfield, OR 97477\",\n  \"paymentMethod\": \"CREDIT_CARD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "checkout"]
+            }
+          }
+        },
+        {
+          "name": "Track Order Status (UC-5)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderNumber}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "{{orderNumber}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Use Case 6: Product Reviews & Ratings",
+      "item": [
+        {
+          "name": "Submit Verified Purchase Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productSku\": \"SKU-PROD-001\",\n  \"rating\": 5,\n  \"title\": \"Outstanding Quality!\",\n  \"comment\": \"Delivered rapidly and exceeds expectations in everyday performance.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Use Case 7: Inventory Management",
+      "item": [
+        {
+          "name": "Manager Stock Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availableStock\": 250,\n  \"lowStockThreshold\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/inventory/items/SKU-PROD-001/stock",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "items", "SKU-PROD-001", "stock"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Use Case 8: Promotional Campaigns",
+      "item": [
+        {
+          "name": "Create Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campaignCode\": \"SPRING2026\",\n  \"title\": \"Spring Megasale\",\n  \"discountPercentage\": 20.00,\n  \"startDate\": \"2026-03-01T00:00:00Z\",\n  \"endDate\": \"2026-06-01T23:59:59Z\",\n  \"status\": \"ACTIVE\",\n  \"applicableSkus\": [\"SKU-PROD-001\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/campaigns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "campaigns"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Campaigns",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/campaigns/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "campaigns", "active"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Use Case 9: Customer Support Ticket",
+      "item": [
+        {
+          "name": "Submit Support Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Inquiry on Order Delivery Timeframe\",\n  \"message\": \"Could you please verify the estimated arrival date for my recent purchase?\",\n  \"priority\": \"MEDIUM\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/support/tickets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "support", "tickets"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Use Case 10: Wishlist Management",
+      "item": [
+        {
+          "name": "Add Item to Wishlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productSku\": \"SKU-PROD-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wishlist/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "wishlist", "items"]
+            }
+          }
+        },
+        {
+          "name": "Move Wishlist Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wishlist/items/SKU-PROD-001/move-to-cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "wishlist", "items", "SKU-PROD-001", "move-to-cart"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

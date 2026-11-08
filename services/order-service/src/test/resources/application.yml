@@ -1,0 +1,40 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: order-service-test
+  datasource:
+    url: jdbc:h2:mem:order_db;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+encryption:
+  secret-key: RetailMicroservicesSystemKey2026!
+
+app:
+  kafka:
+    topics:
+      order-created: test-order-created-topic
+      stock-reserved: test-stock-reserved-topic
+      stock-reservation-failed: test-stock-reservation-failed-topic
+      process-payment: test-process-payment-topic
+      payment-processed: test-payment-processed-topic
+      order-confirmed: test-order-confirmed-topic
+      release-stock: test-release-stock-topic
+

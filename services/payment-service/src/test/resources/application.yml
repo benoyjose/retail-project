@@ -1,0 +1,32 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: payment-service-test
+  datasource:
+    url: jdbc:h2:mem:payment_db;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+app:
+  kafka:
+    topics:
+      process-payment: test-process-payment-topic
+      payment-processed: test-payment-processed-topic
+

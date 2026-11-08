@@ -1,0 +1,266 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+  namespace: retail-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cart-service
+  template:
+    metadata:
+      labels:
+        app: cart-service
+    spec:
+      containers:
+        - name: cart-service
+          image: retail/cart-service:latest
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: retail-global-config
+            - secretRef:
+                name: retail-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+  namespace: retail-system
+spec:
+  selector:
+    app: cart-service
+  ports:
+    - port: 8084
+      targetPort: 8084
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: retail-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: retail/payment-service:latest
+          ports:
+            - containerPort: 8086
+          envFrom:
+            - configMapRef:
+                name: retail-global-config
+            - secretRef:
+                name: retail-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: retail-system
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - port: 8086
+      targetPort: 8086
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  namespace: retail-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inventory-service
+  template:
+    metadata:
+      labels:
+        app: inventory-service
+    spec:
+      containers:
+        - name: inventory-service
+          image: retail/inventory-service:latest
+          ports:
+            - containerPort: 8087
+          envFrom:
+            - configMapRef:
+                name: retail-global-config
+            - secretRef:
+                name: retail-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+  namespace: retail-system
+spec:
+  selector:
+    app: inventory-service
+  ports:
+    - port: 8087
+      targetPort: 8087
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-service
+  namespace: retail-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: review-service
+  template:
+    metadata:
+      labels:
+        app: review-service
+    spec:
+      containers:
+        - name: review-service
+          image: retail/review-service:latest
+          ports:
+            - containerPort: 8088
+          envFrom:
+            - configMapRef:
+                name: retail-global-config
+            - secretRef:
+                name: retail-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: review-service
+  namespace: retail-system
+spec:
+  selector:
+    app: review-service
+  ports:
+    - port: 8088
+      targetPort: 8088
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campaign-service
+  namespace: retail-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: campaign-service
+  template:
+    metadata:
+      labels:
+        app: campaign-service
+    spec:
+      containers:
+        - name: campaign-service
+          image: retail/campaign-service:latest
+          ports:
+            - containerPort: 8089
+          envFrom:
+            - configMapRef:
+                name: retail-global-config
+            - secretRef:
+                name: retail-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: campaign-service
+  namespace: retail-system
+spec:
+  selector:
+    app: campaign-service
+  ports:
+    - port: 8089
+      targetPort: 8089
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-service
+  namespace: retail-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: support-service
+  template:
+    metadata:
+      labels:
+        app: support-service
+    spec:
+      containers:
+        - name: support-service
+          image: retail/support-service:latest
+          ports:
+            - containerPort: 8090
+          envFrom:
+            - configMapRef:
+                name: retail-global-config
+            - secretRef:
+                name: retail-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-service
+  namespace: retail-system
+spec:
+  selector:
+    app: support-service
+  ports:
+    - port: 8090
+      targetPort: 8090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wishlist-service
+  namespace: retail-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wishlist-service
+  template:
+    metadata:
+      labels:
+        app: wishlist-service
+    spec:
+      containers:
+        - name: wishlist-service
+          image: retail/wishlist-service:latest
+          ports:
+            - containerPort: 8091
+          envFrom:
+            - configMapRef:
+                name: retail-global-config
+            - secretRef:
+                name: retail-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wishlist-service
+  namespace: retail-system
+spec:
+  selector:
+    app: wishlist-service
+  ports:
+    - port: 8091
+      targetPort: 8091
+

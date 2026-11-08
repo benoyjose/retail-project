@@ -1,0 +1,212 @@
+version: '3.8'
+
+services:
+  config-server:
+    build:
+      context: ..
+      dockerfile: infrastructure/config-server/Dockerfile
+    container_name: retail-config-server
+    restart: always
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=native
+    networks:
+      - retail-network
+
+  eureka-server:
+    build:
+      context: ..
+      dockerfile: infrastructure/eureka-server/Dockerfile
+    container_name: retail-eureka-server
+    restart: always
+    ports:
+      - "8761:8761"
+    networks:
+      - retail-network
+
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: infrastructure/api-gateway/Dockerfile
+    container_name: retail-api-gateway
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  customer-service:
+    build:
+      context: ..
+      dockerfile: services/customer-service/Dockerfile
+    container_name: retail-customer-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8082:8082"
+    environment:
+      - MYSQL_HOST=mysql
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  product-service:
+    build:
+      context: ..
+      dockerfile: services/product-service/Dockerfile
+    container_name: retail-product-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8083:8083"
+    environment:
+      - MYSQL_HOST=mysql
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  cart-service:
+    build:
+      context: ..
+      dockerfile: services/cart-service/Dockerfile
+    container_name: retail-cart-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8084:8084"
+    environment:
+      - MYSQL_HOST=mysql
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  order-service:
+    build:
+      context: ..
+      dockerfile: services/order-service/Dockerfile
+    container_name: retail-order-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8085:8085"
+    environment:
+      - MYSQL_HOST=mysql
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  payment-service:
+    build:
+      context: ..
+      dockerfile: services/payment-service/Dockerfile
+    container_name: retail-payment-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8086:8086"
+    environment:
+      - MYSQL_HOST=mysql
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  inventory-service:
+    build:
+      context: ..
+      dockerfile: services/inventory-service/Dockerfile
+    container_name: retail-inventory-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8087:8087"
+    environment:
+      - MYSQL_HOST=mysql
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  review-service:
+    build:
+      context: ..
+      dockerfile: services/review-service/Dockerfile
+    container_name: retail-review-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8088:8088"
+    environment:
+      - MYSQL_HOST=mysql
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  campaign-service:
+    build:
+      context: ..
+      dockerfile: services/campaign-service/Dockerfile
+    container_name: retail-campaign-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8089:8089"
+    environment:
+      - MYSQL_HOST=mysql
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  support-service:
+    build:
+      context: ..
+      dockerfile: services/support-service/Dockerfile
+    container_name: retail-support-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8090:8090"
+    environment:
+      - MYSQL_HOST=mysql
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+  wishlist-service:
+    build:
+      context: ..
+      dockerfile: services/wishlist-service/Dockerfile
+    container_name: retail-wishlist-service
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - "8091:8091"
+    environment:
+      - MYSQL_HOST=mysql
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    networks:
+      - retail-network
+
+networks:
+  retail-network:
+    external: true
+

@@ -1,0 +1,84 @@
+name: Retail Microservices CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "master", "main", "develop" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build-and-test:
+    name: Maven Reactor Build & Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B clean test --file pom.xml
+
+      - name: Verify All Service Packages
+        run: mvn -B package -DskipTests --file pom.xml
+
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: '**/target/surefire-reports/*.xml'
+
+  docker-build:
+    name: Docker Image Build & Validation
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - config-server
+          - eureka-server
+          - api-gateway
+          - customer-service
+          - product-service
+          - cart-service
+          - order-service
+          - payment-service
+          - inventory-service
+          - review-service
+          - campaign-service
+          - support-service
+          - wishlist-service
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Package JAR for Service
+        run: mvn -B package -DskipTests -pl common/common-dto,services/${{ matrix.service }},infrastructure/${{ matrix.service }} --also-make
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Dockerfile Syntax
+        run: |
+          if [ -f "infrastructure/${{ matrix.service }}/Dockerfile" ]; then
+            docker build -f infrastructure/${{ matrix.service }}/Dockerfile . -t retail/${{ matrix.service }}:test
+          elif [ -f "services/${{ matrix.service }}/Dockerfile" ]; then
+            docker build -f services/${{ matrix.service }}/Dockerfile . -t retail/${{ matrix.service }}:test
+          fi
+

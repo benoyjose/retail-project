@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: retail-global-config
+  namespace: retail-system
+data:
+  MYSQL_HOST: "mysql.retail-system.svc.cluster.local"
+  MYSQL_PORT: "3306"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.retail-system.svc.cluster.local:9092"
+  EUREKA_SERVER_URL: "http://eureka-server.retail-system.svc.cluster.local:8761/eureka/"
+  SPRING_PROFILES_ACTIVE: "prod"
+
